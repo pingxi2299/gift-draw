@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>交換禮物抽籤器</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --navy: #0e1631;
+      --navy-mid: #122349;
+      --navy-light: #1b2d52;
+      --red: #cf4a3d;
+      --green: #1c6f4c;
+      --gold: #f1c968;
+      --text: #f6eede;
+      --star-gold: #ffd079;
+      --star-amber: #ffb347;
+      --star-rose: #ff9696;
+      --star-blue: #a6d9ff;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 10% 15%, rgba(255, 255, 255, 0.1), transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.12), transparent 45%),
+        radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.06), transparent 50%),
+        linear-gradient(160deg, #090f22 0%, #15254a 55%, #090f22 100%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 16px 80px;
+      line-height: 1.6;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(circle at 65% 20%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 55%),
+        radial-gradient(circle at 30% 45%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 60%);
+      opacity: 0.75;
+    }
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .stars-large::before,
+    .stars-large::after,
+    .stars-small::before,
+    .stars-small::after,
+    .stars-color::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 50%;
+    }
+    .stars-large::before {
+      width: 5px;
+      height: 5px;
+      background: var(--star-gold);
+      box-shadow:
+        5vw 12vh 0 0 rgba(241, 201, 104, 0.95),
+        18vw 25vh 0 1px rgba(255, 245, 210, 0.85),
+        33vw 9vh 0 1px rgba(255, 255, 255, 0.8),
+        60vw 14vh 0 1px rgba(241, 201, 104, 0.85),
+        72vw 33vh 0 0 rgba(255, 225, 160, 0.95),
+        15vw 58vh 0 1px rgba(255, 255, 255, 0.85),
+        42vw 42vh 0 0 rgba(255, 245, 210, 0.85),
+        82vw 64vh 0 1px rgba(241, 201, 104, 0.85),
+        12vw 78vh 0 0 rgba(255, 255, 255, 0.7),
+        58vw 72vh 0 1px rgba(241, 201, 104, 0.9),
+        85vw 18vh 0 0 rgba(255, 255, 255, 0.85),
+        40vw 12vh 0 1px rgba(255, 255, 255, 0.85),
+        25vw 5vh 0 1px rgba(255, 247, 224, 0.9),
+        66vw 4vh 0 1px rgba(255, 247, 224, 0.8),
+        10vw 32vh 0 0 rgba(255, 255, 255, 0.75),
+        90vw 8vh 0 1px rgba(255, 255, 255, 0.8);
+      filter: drop-shadow(0 0 10px rgba(255, 233, 178, 0.7));
+      animation: twinkle 7s ease-in-out infinite alternate;
+    }
+    .stars-large::after {
+      width: 7px;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow:
+        25vw 18vh 0 2px rgba(255, 255, 255, 0.75),
+        48vw 26vh 0 3px rgba(241, 201, 104, 0.85),
+        68vw 12vh 0 2px rgba(255, 255, 255, 0.7),
+        88vw 38vh 0 2px rgba(255, 233, 178, 0.65),
+        32vw 60vh 0 2px rgba(241, 201, 104, 0.78),
+        70vw 72vh 0 2px rgba(255, 255, 255, 0.7),
+        12vw 38vh 0 3px rgba(255, 255, 255, 0.7),
+        55vw 6vh 0 3px rgba(255, 255, 255, 0.65),
+        78vw 54vh 0 2px rgba(255, 255, 255, 0.6),
+        62vw 34vh 0 2px rgba(255, 255, 255, 0.55);
+      opacity: 0.95;
+      animation: twinkle 10s ease-in-out infinite alternate-reverse;
+    }
+    .stars-small::before {
+      width: 3px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow:
+        8vw 8vh 0 0 rgba(255, 255, 255, 0.6),
+        14vw 28vh 0 0 rgba(255, 255, 255, 0.45),
+        22vw 48vh 0 0 rgba(255, 255, 255, 0.5),
+        30vw 18vh 0 0 rgba(255, 255, 255, 0.55),
+        36vw 35vh 0 0 rgba(255, 255, 255, 0.4),
+        46vw 58vh 0 0 rgba(255, 255, 255, 0.52),
+        52vw 10vh 0 0 rgba(255, 255, 255, 0.45),
+        64vw 28vh 0 0 rgba(255, 255, 255, 0.4),
+        76vw 48vh 0 0 rgba(255, 255, 255, 0.6),
+        84vw 22vh 0 0 rgba(255, 255, 255, 0.5),
+        92vw 40vh 0 0 rgba(255, 255, 255, 0.55),
+        6vw 65vh 0 0 rgba(255, 255, 255, 0.45),
+        18vw 70vh 0 0 rgba(255, 255, 255, 0.5),
+        28vw 82vh 0 0 rgba(255, 255, 255, 0.6),
+        44vw 80vh 0 0 rgba(255, 255, 255, 0.55),
+        62vw 82vh 0 0 rgba(255, 255, 255, 0.4),
+        72vw 88vh 0 0 rgba(255, 255, 255, 0.45),
+        90vw 72vh 0 0 rgba(255, 255, 255, 0.5),
+        50vw 20vh 0 0 rgba(255, 255, 255, 0.5),
+        58vw 45vh 0 0 rgba(255, 255, 255, 0.52),
+        68vw 38vh 0 0 rgba(255, 255, 255, 0.48),
+        82vw 10vh 0 0 rgba(255, 255, 255, 0.52),
+        96vw 18vh 0 0 rgba(255, 255, 255, 0.5),
+        2vw 20vh 0 0 rgba(255, 255, 255, 0.45);
+      opacity: 0.9;
+    }
+    .stars-small::after {
+      width: 1px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow:
+        11vw 6vh 0 0 rgba(255, 255, 255, 0.4),
+        24vw 12vh 0 0 rgba(255, 255, 255, 0.35),
+        38vw 22vh 0 0 rgba(255, 255, 255, 0.35),
+        52vw 32vh 0 0 rgba(255, 255, 255, 0.4),
+        66vw 44vh 0 0 rgba(255, 255, 255, 0.35),
+        78vw 16vh 0 0 rgba(255, 255, 255, 0.35),
+        94vw 28vh 0 0 rgba(255, 255, 255, 0.3),
+        4vw 32vh 0 0 rgba(255, 255, 255, 0.4),
+        18vw 40vh 0 0 rgba(255, 255, 255, 0.35),
+        30vw 52vh 0 0 rgba(255, 255, 255, 0.32),
+        42vw 64vh 0 0 rgba(255, 255, 255, 0.38),
+        56vw 56vh 0 0 rgba(255, 255, 255, 0.34),
+        68vw 66vh 0 0 rgba(255, 255, 255, 0.35),
+        80vw 78vh 0 0 rgba(255, 255, 255, 0.3),
+        92vw 84vh 0 0 rgba(255, 255, 255, 0.32),
+        15vw 18vh 0 0 rgba(255, 255, 255, 0.35),
+        47vw 30vh 0 0 rgba(255, 255, 255, 0.32),
+        63vw 52vh 0 0 rgba(255, 255, 255, 0.3),
+        74vw 66vh 0 0 rgba(255, 255, 255, 0.3);
+      opacity: 0.8;
+      animation: twinkle 12s ease-in-out infinite;
+    }
+    .stars-color::before {
+      width: 4px;
+      height: 4px;
+      background: var(--star-blue);
+      box-shadow:
+        9vw 14vh 0 0 rgba(166, 217, 255, 0.8),
+        28vw 10vh 0 0 rgba(255, 150, 150, 0.8),
+        44vw 26vh 0 0 rgba(255, 208, 121, 0.7),
+        66vw 18vh 0 0 rgba(255, 179, 71, 0.75),
+        78vw 8vh 0 0 rgba(255, 150, 150, 0.75),
+        20vw 40vh 0 0 rgba(166, 217, 255, 0.75),
+        36vw 52vh 0 0 rgba(255, 208, 121, 0.7),
+        54vw 48vh 0 0 rgba(255, 150, 150, 0.7),
+        72vw 58vh 0 0 rgba(255, 179, 71, 0.7),
+        88vw 52vh 0 0 rgba(166, 217, 255, 0.7),
+        24vw 76vh 0 0 rgba(255, 208, 121, 0.65),
+        48vw 82vh 0 0 rgba(255, 150, 150, 0.65),
+        70vw 80vh 0 0 rgba(166, 217, 255, 0.65);
+      filter: drop-shadow(0 0 12px rgba(255, 231, 193, 0.6));
+      animation: twinkle 9s ease-in-out infinite alternate;
+    }
+    @keyframes twinkle {
+      0% {
+        opacity: 0.4;
+        transform: scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1.07);
+      }
+    }
+    .card {
+      width: min(860px, 100%);
+      background: rgba(14, 22, 49, 0.85);
+      border-radius: 22px;
+      padding: 36px 32px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45);
+      border: 2px solid rgba(241, 201, 104, 0.35);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .card::before,
+    .card::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(241, 201, 104, 0.8), transparent 70%);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .card::before {
+      width: 220px;
+      height: 220px;
+      top: -120px;
+      right: -90px;
+    }
+    .card::after {
+      width: 160px;
+      height: 160px;
+      bottom: -80px;
+      left: -60px;
+    }
+    h1 {
+      font-size: 1.7rem;
+      margin-bottom: 0.2rem;
+      color: var(--gold);
+      text-align: center;
+      }
+    h1 span {
+      color: rgba(206,119,119,1);
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 24px;
+      color: var(--gold);
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      box-sizing: border-box;
+      padding: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      border-radius: 12px;
+      border: 2px solid rgba(241, 201, 104, 0.4);
+      background: rgba(12, 20, 44, 0.9);
+      color: var(--text);
+      resize: vertical;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(241, 201, 104, 0.2);
+    }
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    button {
+      padding: 10px 22px;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 999px;
+      border: none;
+      font-weight: 600;
+      color: var(--text);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      background: linear-gradient(120deg, rgba(235, 151, 151, 1), rgba(170, 70, 70, 1));
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    }
+    .btn-green {
+      background: linear-gradient(120deg, rgb(126, 183, 144), rgb(68, 119, 87));
+    }
+    button:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 14px 24px rgba(0, 0, 0, 0.45);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(241, 201, 104, 0.2);
+      color: var(--text);
+    }
+    th, td {
+      border: 1px solid rgba(241, 201, 104, 0.12);
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 14px;
+    }
+    th {
+      background: linear-gradient(135deg, var(--navy-light), var(--navy-mid));
+      color: var(--gold);
+      letter-spacing: 0.3px;
+    }
+    tbody tr:nth-child(odd) {
+      background: rgba(11, 19, 42, 0.9);
+    }
+    tbody tr:nth-child(even) {
+      background: rgba(15, 26, 50, 0.9);
+    }
+    .note {
+      font-size: 13px;
+      color: var(--text);
+      background: rgba(18, 35, 73, 0.8);
+      border-left: 4px solid  rgba(206,119,119,1);
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+    #error {
+      font-weight: 600;
+      color: #ff8d8d;
+    }
+    @media (max-width: 600px) {
+      .card {
+        padding: 26px 18px;
+      }
+      h1 {
+        font-size: 1.4rem;
+      }
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+      .button-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars stars-large" aria-hidden="true"></div>
+  <div class="stars stars-small" aria-hidden="true"></div>
+  <div class="stars stars-color" aria-hidden="true"></div>
+  <div class="card">
+  <h1><span>2025 東區聖誕節</span></h1>
+  <h1>交換禮物抽籤器</h1>
+  <p class="note">
+    ✨每人會被分配一個「天堂禮物對象」與一個「地獄禮物對象」，且都不會抽到自己。<br>
+    ✨天堂與地獄是兩次獨立抽籤，所以對象<b>可以</b>一樣也可以不一樣。<br>
+  </p>
+
+  <label for="names">請輸入參加者名單（每行一個人）：</label><br>
+  <textarea id="names" placeholder="例如：&#10;小明&#10;小美&#10;阿豪&#10;雨璇&#10;……"></textarea>
+  <div class="button-row">
+    <button onclick="runDraw()">產生抽籤結果</button>
+    <button class="btn-green" onclick="downloadCsv()">下載 Excel/CSV</button>
+  </div>
+
+  <div id="error" style="margin-top: 8px;"></div>
+
+  <table id="resultTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>送禮人</th>
+        <th>天堂禮物送給</th>
+        <th>地獄禮物送給</th>
+      </tr>
+    </thead>
+    <tbody id="resultBody"></tbody>
+  </table>
+
+  <script>
+    let latestResult = [];
+
+    function shuffle(array) {
+      // Fisher-Yates 洗牌
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function makeDerangement(n) {
+      // 產生一個 0..n-1 的排列，且沒有 i -> i
+      if (n <= 1) return null; // 只有一個人無法抽
+
+      let perm = [];
+      const maxTry = 10000;
+      for (let t = 0; t < maxTry; t++) {
+        perm = shuffle(Array.from({ length: n }, (_, i) => i));
+        let ok = true;
+        for (let i = 0; i < n; i++) {
+          if (perm[i] === i) {
+            ok = false;
+            break;
+          }
+        }
+        if (ok) return perm;
+      }
+      return null; // 極小機率失敗
+    }
+
+    function runDraw() {
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = '';
+
+      const raw = document.getElementById('names').value
+        .split('\n')
+        .map(s => s.trim())
+        .filter(s => s !== '');
+
+      const uniqueNames = Array.from(new Set(raw)); // 去掉重複名字
+
+      if (uniqueNames.length < 2) {
+        errorDiv.textContent = '至少需要兩個不同名字才能抽籤。';
+        document.getElementById('resultTable').style.display = 'none';
+        document.getElementById('resultText').textContent = '';
+        return;
+      }
+
+      const n = uniqueNames.length;
+
+      const heavenIdx = makeDerangement(n);
+      const hellIdx   = makeDerangement(n);
+
+      if (!heavenIdx || !hellIdx) {
+        errorDiv.textContent = '抽籤演算法發生錯誤，請再試一次。';
+        return;
+      }
+
+      const tbody = document.getElementById('resultBody');
+      tbody.innerHTML = '';
+
+      latestResult = [];
+
+      for (let i = 0; i < n; i++) {
+        const giver = uniqueNames[i];
+        const heavenReceiver = uniqueNames[heavenIdx[i]];
+        const hellReceiver   = uniqueNames[hellIdx[i]];
+
+        const tr = document.createElement('tr');
+        const tdGiver = document.createElement('td');
+        const tdHeaven = document.createElement('td');
+        const tdHell = document.createElement('td');
+
+        tdGiver.textContent = giver;
+        tdHeaven.textContent = heavenReceiver;
+        tdHell.textContent = hellReceiver;
+
+        tr.appendChild(tdGiver);
+        tr.appendChild(tdHeaven);
+        tr.appendChild(tdHell);
+        tbody.appendChild(tr);
+
+        latestResult.push({ giver, heaven: heavenReceiver, hell: hellReceiver });
+      }
+
+      document.getElementById('resultTable').style.display = 'table';
+    }
+
+    function downloadCsv() {
+      if (!latestResult.length) {
+        alert('還沒有結果可以下載，請先按「產生抽籤結果」。');
+        return;
+      }
+
+      const header = '送禮人,天堂禮物送給,地獄禮物送給';
+      const rows = latestResult.map(({ giver, heaven, hell }) => [giver, heaven, hell]
+        .map(text => '"' + text.replace(/"/g, '""') + '"')
+        .join(','));
+      const csv = [header, ...rows].join('\n');
+      const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      a.href = url;
+      a.download = `gift-draw-${timestamp}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+  </script>
+  </div>
+</body>
+</html>
